@@ -1,0 +1,46 @@
+# Docker Composeのバージョン指定
+version: '3.8'
+
+services:
+  # 1つ目のコンテナ：アプリケーション（.NETとNode.js/Vue.jsが両方動く環境）を動かす
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # ソースコードをコンテナ側と同期させる設定（宿主のフォルダを /workspace にマウント）
+    volumes:
+      - ..:/workspace:cached
+    # コンテナが勝手に終了しないように無限待機させる
+    command: sleep infinity
+    # 外部（パソコン側）からアクセスできるようにポートを解放
+    ports:
+      - "5000:5000" # .NET API用ポート
+      - "5173:5173" # Vue.js (Vite)用ポート
+    # データベースコンテナへ接続するための環境変数（パスワードや接続先）
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=tododb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    # dbコンテナが完全に起動してからappコンテナを動かす設定
+    depends_on:
+      - db
+
+  # 2つ目のコンテナ：PostgreSQL（データベース）を動かす
+  db:
+    image: postgres:15-alpine
+    restart: always
+    # データベースの初期設定
+    environment:
+      POSTGRES_DB: tododb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432" # データベースの標準ポート
+    # データをコンテナが消えても消えないように保存する領域（ボリューム）の指定
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

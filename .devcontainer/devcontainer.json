@@ -1,0 +1,26 @@
+{
+  "name": "Vue + .NET + PostgreSQL DevEnv",
+  
+  // 使用するdocker-composeファイルの指定
+  "dockerComposeFile": "docker-compose.yml",
+  
+  // メインで操作するコンテナ名の指定
+  "service": "app",
+  
+  // 開いたときにコンテナ内で基準となるフォルダ
+  "workspaceFolder": "/workspace",
+
+  // VS Codeに最初から導入しておきたい拡張機能のリスト
+//   "customizations": {
+//     "vscode": {
+//       "extensions": [
+//         "ms-dotnettools.csharp",               // C# / .NET 開発用
+//         "vue.volar",                           // Vue.js 開発用
+//         "cweijan.vscode-postgresql-client2"    // データベースの中身を見るため
+//       ]
+//     }
+//   },
+
+  // コンテナが立ち上がった後に自動実行するコマンド（バージョン確認）
+  "postCreateCommand": "dotnet --version && node -v"
+}
